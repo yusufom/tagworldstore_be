@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +31,7 @@ SECRET_KEY = 'django-insecure-srwqd9%^q570u%@%-$mm!&=pzu@8o+ys7c@y)#_4+&sj3n&a49
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -41,6 +47,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_countries',
     'djoser',
+    'drf_yasg',
+    "corsheaders",
+    
 ]
 
 MIDDLEWARE = [
@@ -51,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'tagworldstore.urls'
@@ -111,7 +121,8 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
 }
 
 SIMPLE_JWT = {
@@ -149,3 +160,43 @@ REST_USE_JWT = True
 
 STRIPE_PUBLIC_KEY = 'pk_test_lX3r6OMjOU2yzFsNSHq6belT00EY82kZmH'
 STRIPE_SECRET_KEY = 'sk_test_tn0CTDaIJHUJyAqhsf39cfsC00LNjsqDnb'
+
+SERVER_EMAIL = "Rezzy <yusufolamilekanmuktar@gmail.com>"  # ditto (default from-email for Django errors)
+
+ANYMAIL = {
+    "SENDINBLUE_API_KEY": os.environ.get('SENDINBLUE_API_KEY'),
+    "SENDINBLUE_SENDER_DOMAIN": SERVER_EMAIL, 
+}
+
+EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
+
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_HOST_USER = SERVER_EMAIL
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = SERVER_EMAIL
+
+"""Cors Config"""
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_HEADER_NAME = "X-CSRFToken"
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+    "DELETE"
+]
+
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+}
