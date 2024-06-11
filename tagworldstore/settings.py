@@ -50,6 +50,11 @@ INSTALLED_APPS = [
     'drf_yasg',
     "corsheaders",
     
+    'cloudinary_storage',
+    'cloudinary',
+    'core',
+    'products'
+    
 ]
 
 MIDDLEWARE = [
@@ -119,9 +124,7 @@ REST_FRAMEWORK = {
     ),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
 }
 
@@ -145,6 +148,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'  # or any prefix you choose
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -193,6 +198,11 @@ CORS_ALLOW_METHODS = [
     "DELETE"
 ]
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dsh9mbrve',
+    'API_KEY': '395456385749928',
+    'API_SECRET': '3B-7m54dvtJYCkTdTXBmGFvpo24'
+}
 
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
