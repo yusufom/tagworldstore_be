@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from products.models import Image, Product, Variation
+from products.models import Image, Product, Variation, Size
 
 
 class VariationSerializer(serializers.ModelSerializer):
@@ -33,3 +33,34 @@ class ProductSerializer(serializers.ModelSerializer):
     
     def get_category(self, obj):
         return [cat.name for cat in obj.category.all()]
+    
+class SizeCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = "__all__"
+class VariationCartSerializer(serializers.ModelSerializer):
+    size = SizeCartSerializer(many=True)
+    
+    
+    class Meta:
+        model = Variation
+        exclude = ["products", "image"]
+        
+
+class ImagesCartSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Image
+        exclude = ["products", "id"]
+        depth = 1
+           
+class ProductCartSerializer(serializers.ModelSerializer):
+    variation = VariationCartSerializer(many=True)
+    id = serializers.CharField(read_only=True)
+    slug = serializers.CharField(read_only=True)
+    
+    
+    class Meta:
+        model = Product
+        exclude = ["category", "tag"]
+        depth = 2

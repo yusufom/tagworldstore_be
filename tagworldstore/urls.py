@@ -38,6 +38,7 @@ urlpatterns = [
     re_path(r'^api/v1/auth/', include('djoser.urls')),
     re_path(r'^api/v1/auth/', include('djoser.urls.jwt')),
     re_path(r'^api/v1/products/', include('products.urls')),
+    re_path(r'^api/v1/orders/', include('orders.urls')),
 
     
     
