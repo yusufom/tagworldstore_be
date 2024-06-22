@@ -79,8 +79,14 @@ class ReviewSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductReview
-        fields = "__all__"
+        exclude = ["user", "approved", "product"]
         depth = 1
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['customer'] = f"{instance.user.profile.first_name} {instance.user.profile.last_name}"
+
+        return representation
         
 class CreateReviewSerializer(serializers.ModelSerializer):
     

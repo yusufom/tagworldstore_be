@@ -29,17 +29,28 @@ class ProductSingleView(APIView):
             return Response(data={"error": str(e)})
         
         
+class GetAllWishListApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        try:
+            wishlist = WishList.objects.filter(user=user).first()
+            if wishlist:
+                serializer = WishListSerializer(wishlist.product.all(), many=True)
+                return Response(serializer.data)
+            else:
+                wishlist_create = WishList.objects.create(user=request.user)
+                wishlist_create.save()
+                serializer = WishListSerializer(wishlist_create.product.all(), many=True)
+                return Response(serializer.data)
+            return Response(data={"sys": user})
+        except Exception as e:
+            return Response(data={"error m": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 class WishListApiView(APIView):
     permission_classes = [IsAuthenticated]
     
-    
-    def get(self, request):
-        print(request.user)
-        user = request.user
-        try:
-            pass
-        except Exception as e:
-            return Response(data={"error m": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request):
         product = Product.objects.get(id=request.data['product'])
@@ -80,9 +91,11 @@ class ProductReviewtView(APIView):
     permission_classes = [IsAuthenticated]
         
     def post(self, request):
+        print()
         serializer = CreateReviewSerializer(data=request.data)
+        
         if serializer.is_valid():
             serializer.save(user=request.user)
-            return Response(serializer.data)
+            return Response(data={"message": "Review has been successfully added"})
             
-        return Response(data={"message": "Review has been successfully added"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
