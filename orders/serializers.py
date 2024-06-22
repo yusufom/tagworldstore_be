@@ -20,3 +20,10 @@ class CartItemListSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'product',  'quantity', 'selected_product_color', 'selected_product_size']
         depth = 1
+        
+class LineItemSerializer(serializers.Serializer):
+    price = serializers.CharField(max_length=255)
+    quantity = serializers.IntegerField()
+
+class CheckoutSessionSerializer(serializers.Serializer):
+    line_items = LineItemSerializer(many=True)

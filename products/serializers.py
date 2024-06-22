@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from products.models import Image, Product, Variation, Size
+from products.models import Image, Product, Variation, Size, WishList, ProductReview
 
 
 class VariationSerializer(serializers.ModelSerializer):
@@ -64,3 +64,26 @@ class ProductCartSerializer(serializers.ModelSerializer):
         model = Product
         exclude = ["category", "tag"]
         depth = 2
+        
+        
+class WishListSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    
+    class Meta:
+        model = WishList
+        fields = ["product"]
+        depth = 1
+        
+        
+class ReviewSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ProductReview
+        fields = "__all__"
+        depth = 1
+        
+class CreateReviewSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ProductReview
+        exclude = ["user", "approved"]
