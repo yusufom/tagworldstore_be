@@ -26,4 +26,9 @@ class LineItemSerializer(serializers.Serializer):
     quantity = serializers.IntegerField()
 
 class CheckoutSessionSerializer(serializers.Serializer):
+    pkid = serializers.UUIDField()
     line_items = LineItemSerializer(many=True)
+    
+    
+class OrderSerializer(serializers.Serializer):
+    items = serializers.ListField()

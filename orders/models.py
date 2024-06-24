@@ -1,9 +1,12 @@
+from typing import Iterable
 from django.db import models
 from django.conf import settings
 
 from products.models import Product
 User = settings.AUTH_USER_MODEL
 # Create your models here.
+import uuid
+
 
 
 ADDRESS_CHOICES = (
@@ -39,12 +42,14 @@ class CartItem(models.Model):
         return self.get_total_item_price()
     
 class Order(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, editable=False, verbose_name='ID')
+    pkid = models.UUIDField(default=uuid.uuid4, auto_created=True, editable=False, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
-    ref_code = models.CharField(max_length=20)
+    ref_code = models.CharField(max_length=20, blank=True, null=True)
     items = models.ManyToManyField(CartItem)
     start_date = models.DateTimeField(auto_now_add=True)
-    ordered_date = models.DateTimeField()
+    ordered_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     ordered = models.BooleanField(default=False)
     shipping_address = models.ForeignKey(
         'BillingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
@@ -58,6 +63,14 @@ class Order(models.Model):
     received = models.BooleanField(default=False)
     refund_requested = models.BooleanField(default=False)
     refund_granted = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return str(self.user) + "-" + str(self.pkid)
+    
+    def save(self, *args, **kwargs) -> None:
+        if not self.pkid:
+            self.pkid = uuid.uuid4()
+        return super().save(*args, **kwargs)
     
     def get_total(self):
         total = 0

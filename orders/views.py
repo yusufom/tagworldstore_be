@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from products.models import Product, Size, Variation
-from .models import CartItem
-from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer
+from .models import CartItem, Order
+from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, OrderSerializer
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -51,7 +51,8 @@ class CartViewSet(viewsets.ViewSet):
                 user=user,
                 product=product,
                 selected_product_color=request.data.get('selected_product_color'),
-                selected_product_size=request.data.get('selected_product_size')
+                selected_product_size=request.data.get('selected_product_size'),
+                ordered=False
             ).first()
             
 
@@ -60,6 +61,7 @@ class CartViewSet(viewsets.ViewSet):
                 if cart_item.quantity > size.stock:
                     return Response({"error": "Not enough stock available"}, status=status.HTTP_400_BAD_REQUEST)
                 cart_item.save()
+                    
             else:
                 serializer.save(product=product, user=user)
                 
@@ -97,17 +99,40 @@ class CartViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['post'])
     def create_checkout_session(self, request):
-        print(request.data)
+        print("data here",request.data)
         serializer = CheckoutSessionSerializer(data=request.data)
         if serializer.is_valid():
+            pkid = serializer.validated_data['pkid']
             try:
                 checkout_session = stripe.checkout.Session.create(
                     line_items=serializer.validated_data['line_items'],
                     mode='payment',
-                    success_url=YOUR_DOMAIN + '?success=true',
-                    cancel_url=YOUR_DOMAIN + '?canceled=true',
+                    success_url=YOUR_DOMAIN + '/?soc12sde=' + str(pkid) +'&success=true',
+                    cancel_url=YOUR_DOMAIN + '/?soc12sde=' + str(pkid) + '&canceled=true',
                 )
                 return Response({'url': checkout_session.url})
             except Exception as e:
                 return Response({'error': str(e)}, status=400)
         return Response(serializer.errors, status=400)
+
+
+class OrderViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def create(self, request):
+        try:
+            user = request.user
+            serializer = OrderSerializer(data=request.data)
+            if serializer.is_valid():
+                print(serializer.validated_data['items'])
+                order = Order.objects.create(user=user)
+                for item in serializer.validated_data['items']:
+                    cart_item = CartItem.objects.get(id=item['id'], user=user)
+                    cart_item.ordered = True
+                    order.items.add(cart_item)
+                    cart_item.save()
+                order.save()
+                return Response({"pkid": order.pkid})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
