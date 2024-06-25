@@ -69,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'tagworldstore.urls'
@@ -101,6 +102,17 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD'),
+#         'HOST': os.environ.get('DB_HOST'),
+#         'PORT': os.environ.get('DB_PORT'),
+#     }
+# }
 
 
 # Password validation
@@ -162,6 +174,9 @@ STATIC_URL = 'static/'
 MEDIA_URL = '/media/'  # or any prefix you choose
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -174,8 +189,8 @@ LOGIN_REDIRECT_URL = '/'
 REST_USE_JWT = True
 
 
-STRIPE_PUBLIC_KEY = 'pk_test_lX3r6OMjOU2yzFsNSHq6belT00EY82kZmH'
-STRIPE_SECRET_KEY = 'sk_test_tn0CTDaIJHUJyAqhsf39cfsC00LNjsqDnb'
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 
 SERVER_EMAIL = "Rezzy <yusufolamilekanmuktar@gmail.com>"  # ditto (default from-email for Django errors)
 
@@ -211,8 +226,8 @@ CORS_ALLOW_METHODS = [
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dsh9mbrve',
-    'API_KEY': '395456385749928',
-    'API_SECRET': '3B-7m54dvtJYCkTdTXBmGFvpo24'
+    'API_KEY': os.environ.get('CLOUDINARY_STORAGE_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_STORAGE_API_SECRET')
 }
 
 DJOSER = {

@@ -9,12 +9,16 @@ from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSes
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 import stripe
 
-stripe.api_key = 'sk_test_51PToko2MhBsxnjfBB2l9FXzrFyJJKDRI4BtwE2MJwACUDysEHSInJ0F52vf5DHtOCVrtt84bwZz3BoJazeHiV4oS00VpJL9sch'
-
-YOUR_DOMAIN = 'http://localhost:3000/checkout'
+stripe.api_key = os.environ.get('STRIPE_API_KEY')
+YOUR_DOMAIN = os.environ.get('YOUR_DOMAIN')
 
 
 
