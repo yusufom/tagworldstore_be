@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 
 from products.models import Product, Size, Variation
 from .models import CartItem, Order
-from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, OrderSerializer
+from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, ConfirmOrderSerializer, OrderSerializer
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -137,6 +137,29 @@ class OrderViewSet(viewsets.ViewSet):
                     cart_item.save()
                 order.save()
                 return Response({"pkid": order.pkid})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def update(self, request):
+        try:
+            user = request.user
+            serializer = ConfirmOrderSerializer(data=request.data)
+            
+            if serializer.is_valid():
+                if serializer.validated_data['status'] == "success":
+                    order = Order.objects.get(user=user, id=serializer.validated_data['order_id'])
+                    order.is_paid = True
+                    cart_items = CartItem.objects.filter(user=user, ordered=False)
+                    for cart_item in cart_items:
+                        cart_item.ordered = True
+                        cart_item.save()
+                    order.save()
+                else:
+                    order = Order.objects.get(user=user, id=serializer.validated_data['order_id'])
+                    order.is_paid = False
+                    order.save()
+                return Response({"message": "order successful"})
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
