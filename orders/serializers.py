@@ -34,6 +34,6 @@ class OrderSerializer(serializers.Serializer):
     items = serializers.ListField()
     
     
-class ConfirmOrderSerializer(serializers.ModelSerializer):
+class ConfirmOrderSerializer(serializers.Serializer):
     order_id = serializers.UUIDField()
     status = serializers.CharField()

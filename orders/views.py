@@ -140,15 +140,16 @@ class OrderViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    def update(self, request):
+    @action(detail=False, methods=['put'])
+    def update_order(self, request):
+        print(request.data)
         try:
             user = request.user
             serializer = ConfirmOrderSerializer(data=request.data)
             
             if serializer.is_valid():
+                order = Order.objects.get(user=user, pkid=serializer.validated_data['order_id'])
                 if serializer.validated_data['status'] == "success":
-                    order = Order.objects.get(user=user, id=serializer.validated_data['order_id'])
                     order.is_paid = True
                     cart_items = CartItem.objects.filter(user=user, ordered=False)
                     for cart_item in cart_items:
@@ -156,7 +157,6 @@ class OrderViewSet(viewsets.ViewSet):
                         cart_item.save()
                     order.save()
                 else:
-                    order = Order.objects.get(user=user, id=serializer.validated_data['order_id'])
                     order.is_paid = False
                     order.save()
                 return Response({"message": "order successful"})
