@@ -34,7 +34,6 @@ class Image(models.Model):
     image = models.ImageField(upload_to='assets/img/product/fashion/')
 
 class Product(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, verbose_name='ID')
     sku = models.CharField(max_length=50)
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)

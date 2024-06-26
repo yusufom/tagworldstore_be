@@ -5,6 +5,7 @@ charset-normalizer==3.3.2
 cloudinary==1.40.0
 cryptography==42.0.8
 defusedxml==0.7.1
+dj-database-url==2.2.0
 Django==3.2
 django-anymail==10.3
 django-cloudinary-storage==0.3.0
@@ -19,7 +20,7 @@ gunicorn==22.0.0
 idna==3.7
 inflection==0.5.1
 Markdown==3.6
-
+mysqlclient==2.2.4
 oauthlib==3.2.2
 packaging==24.0
 pillow==10.3.0

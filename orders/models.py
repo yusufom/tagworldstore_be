@@ -42,7 +42,6 @@ class CartItem(models.Model):
         return self.get_total_item_price()
     
 class Order(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, editable=False, verbose_name='ID')
     pkid = models.UUIDField(default=uuid.uuid4, auto_created=True, editable=False, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
