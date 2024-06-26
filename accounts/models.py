@@ -29,5 +29,6 @@ def save_user_profile(sender, instance, **kwargs):
     
     
 @receiver(post_delete, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.delete()
+def delete_user_profile(sender, instance, **kwargs):
+    profile = Profile.objects.get(user=instance, email=instance.email)
+    profile.delete()
