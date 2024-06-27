@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from orders.models import CartItem
+from orders.models import CartItem, Order
 from products.models import Product
 from products.serializers import ProductCartSerializer, ProductSerializer
 
@@ -37,3 +37,11 @@ class OrderSerializer(serializers.Serializer):
 class ConfirmOrderSerializer(serializers.Serializer):
     order_id = serializers.UUIDField()
     status = serializers.CharField()
+    
+    
+class ListOrderSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Order
+        fields = '__all__'
+        depth = 1

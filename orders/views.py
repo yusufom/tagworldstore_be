@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 
 from products.models import Product, Size, Variation
 from .models import CartItem, Order
-from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, ConfirmOrderSerializer, OrderSerializer
+from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, ConfirmOrderSerializer, ListOrderSerializer, OrderSerializer
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -123,6 +123,12 @@ class CartViewSet(viewsets.ViewSet):
 class OrderViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     
+    def list(self, request):
+        user = request.user
+        orders = Order.objects.filter(user=user).order_by('-ordered_date')
+        serializer = ListOrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    
     def create(self, request):
         try:
             user = request.user
@@ -163,3 +169,5 @@ class OrderViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
