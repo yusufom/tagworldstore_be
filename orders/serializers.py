@@ -45,3 +45,7 @@ class ListOrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
         depth = 1
+        
+        
+class CreateMulitpleCartItemsSerializer(serializers.Serializer):
+    items = serializers.ListField()

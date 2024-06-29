@@ -2,10 +2,11 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 
 from products.models import Product, Size, Variation
 from .models import CartItem, Order
-from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, ConfirmOrderSerializer, ListOrderSerializer, OrderSerializer
+from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, ConfirmOrderSerializer, CreateMulitpleCartItemsSerializer, ListOrderSerializer, OrderSerializer
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -20,7 +21,42 @@ import stripe
 stripe.api_key = os.environ.get('STRIPE_API_KEY')
 YOUR_DOMAIN = os.environ.get('YOUR_DOMAIN')
 
-
+class CreateCartMultiple(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def put(self, request):
+        user = request.user
+        serializer = CreateMulitpleCartItemsSerializer(data=request.data)
+        if serializer.is_valid():
+            items = serializer.validated_data.get('items')
+            for item in items:
+                product_data = item.get('product')
+                product = Product.objects.get(id=product_data["id"])
+                cart_item_filter = CartItem.objects.filter(
+                    user=user,
+                    product=product,
+                    selected_product_color=item.get('selected_product_color'),
+                    selected_product_size=item.get('selected_product_size'),
+                    ordered=False
+                ).first()
+                if cart_item_filter:
+                    cart_item_filter.quantity += item.get('quantity')
+                    cart_item_filter.save()
+                else:
+                    cart_item = CartItem.objects.create(
+                        user=user,
+                        product=product,
+                        selected_product_color=item.get('selected_product_color'),
+                        selected_product_size=item.get('selected_product_size'),
+                        quantity=item.get('quantity'),
+                        ordered=False
+                    )
+                    cart_item.save()
+                    
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class CartViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
