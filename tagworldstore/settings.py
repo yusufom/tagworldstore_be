@@ -32,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-srwqd9%^q570u%@%-$mm!&=pzu@8o+ys7c@y)#_4+&sj3n&a49'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["www.tagworld-django.pvdxzh.easypanel.host", "tagworld-django.pvdxzh.easypanel.host", "tagworldadmin.com", "127.0.0.1"]
 
