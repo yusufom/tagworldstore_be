@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.template.defaultfilters import slugify
 
 
 class Category(models.Model):
@@ -8,6 +9,10 @@ class Category(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
@@ -15,6 +20,10 @@ class Tag(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 class Size(models.Model):
     name = models.CharField(max_length=10)
@@ -51,6 +60,10 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 
 class WishList(models.Model):
