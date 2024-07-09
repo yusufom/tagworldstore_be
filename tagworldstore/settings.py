@@ -36,7 +36,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["www.tagworld-django.pvdxzh.easypanel.host", "tagworld-django.pvdxzh.easypanel.host", "tagworldadmin.com", "127.0.0.1","0.0.0.0"]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -230,6 +229,7 @@ CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "X-CSRFToken"
+CSRF_TRUSTED_ORIGINS = ["tagworld-django.pvdxzh.easypanel.host", "tagworldadmin.com"]
 
 CORS_ALLOW_METHODS = [
     "GET",
