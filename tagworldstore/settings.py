@@ -229,7 +229,7 @@ CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "X-CSRFToken"
-CSRF_TRUSTED_ORIGINS = ["tagworld-django.pvdxzh.easypanel.host", "tagworldadmin.com"]
+CSRF_TRUSTED_ORIGINS = ["https://tagworld-django.pvdxzh.easypanel.host", "https://tagworldadmin.com"]
 
 CORS_ALLOW_METHODS = [
     "GET",
