@@ -40,11 +40,18 @@ class ConfirmOrderSerializer(serializers.Serializer):
     
     
 class ListOrderSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True)
     
     class Meta:
         model = Order
         fields = '__all__'
         depth = 1
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['total_price'] = instance.get_total()
+
+        return representation
         
         
 class CreateMulitpleCartItemsSerializer(serializers.Serializer):

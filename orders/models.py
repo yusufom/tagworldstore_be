@@ -22,7 +22,7 @@ class CartItem(models.Model):
     quantity = models.IntegerField(default=1)
     selected_product_color = models.CharField(max_length=50, null=True, blank=True)
     selected_product_size = models.CharField(max_length=50, null=True, blank=True)
-    image = models.CharField(max_length=500,null=True, blank=True)
+    total_price = models.CharField(max_length=50, null=True, blank=True)
 
 
     def __str__(self):
@@ -32,17 +32,29 @@ class CartItem(models.Model):
         return self.quantity * self.product.price
 
     def get_total_discount_item_price(self):
-        return self.quantity * ((self.product.discount/100) * self.product.price)
+        return self.quantity * (self.product.price - ((self.product.discount/100) * self.product.price))
 
     def get_amount_saved(self):
         return self.get_total_item_price() - self.get_total_discount_item_price()
 
     def get_final_price(self):
-        if self.item.discount:
+        if self.product.discount:
             return self.get_total_discount_item_price()
         return self.get_total_item_price()
     
+    def save(self, *args, **kwargs) -> None:
+        self.total_price = self.get_final_price()
+        return super().save(*args, **kwargs)
+    
 class Order(models.Model):
+    
+    class StatusChoices(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        BEING_DELIVERED = 'BEING_DELIVERED', 'Being Delivered'
+        RECEIVED = 'RECEIVED', 'Received'
+        REFUND_REQUESTED = 'REFUND_REQUESTED', 'Refund Requested'
+        REFUND_GRANTED = 'REFUND_GRANTED', 'Refund Granted'
+        
     pkid = models.UUIDField(default=uuid.uuid4, auto_created=True, editable=False, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ref_code = models.CharField(max_length=20, blank=True, null=True)
@@ -50,15 +62,16 @@ class Order(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     ordered = models.BooleanField(default=False)
-    shipping_address = models.ForeignKey('BillingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
-    billing_address = models.ForeignKey('BillingAddress', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
-    payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)
-    coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, blank=True, null=True)
-    being_delivered = models.BooleanField(default=False)
-    received = models.BooleanField(default=False)
+    shipping_address = models.ForeignKey(
+        'BillingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
+    billing_address = models.ForeignKey(
+        'BillingAddress', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
+    payment = models.ForeignKey(
+        'Payment', on_delete=models.SET_NULL, blank=True, null=True)
+    coupon = models.ForeignKey(
+        'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
     is_paid = models.BooleanField(default=False)
-    refund_requested = models.BooleanField(default=False)
-    refund_granted = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.PENDING)
     
     def __str__(self) -> str:
         return str(self.user) + "-" + str(self.pkid)

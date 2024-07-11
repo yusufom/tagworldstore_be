@@ -56,7 +56,8 @@ class Product(models.Model):
     tag = models.ManyToManyField(Tag)
     short_description = models.TextField()
     full_description = models.TextField()
-    slug = models.SlugField(default="", null=False) 
+    slug = models.SlugField(default="", null=False)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
