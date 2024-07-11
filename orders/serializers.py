@@ -24,6 +24,7 @@ class CartItemListSerializer(serializers.ModelSerializer):
 class LineItemSerializer(serializers.Serializer):
     price = serializers.CharField(max_length=255)
     quantity = serializers.IntegerField()
+    image = serializers.CharField(max_length=500,allow_blank=True, required=False)
 
 class CheckoutSessionSerializer(serializers.Serializer):
     pkid = serializers.UUIDField()

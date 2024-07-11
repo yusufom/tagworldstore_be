@@ -181,6 +181,7 @@ class OrderViewSet(viewsets.ViewSet):
                 return Response({"pkid": order.pkid})
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            print(e)
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     @action(detail=False, methods=['put'])
     def update_order(self, request):

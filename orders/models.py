@@ -22,6 +22,7 @@ class CartItem(models.Model):
     quantity = models.IntegerField(default=1)
     selected_product_color = models.CharField(max_length=50, null=True, blank=True)
     selected_product_size = models.CharField(max_length=50, null=True, blank=True)
+    image = models.CharField(max_length=500,null=True, blank=True)
 
 
     def __str__(self):
@@ -43,21 +44,16 @@ class CartItem(models.Model):
     
 class Order(models.Model):
     pkid = models.UUIDField(default=uuid.uuid4, auto_created=True, editable=False, unique=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ref_code = models.CharField(max_length=20, blank=True, null=True)
     items = models.ManyToManyField(CartItem)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     ordered = models.BooleanField(default=False)
-    shipping_address = models.ForeignKey(
-        'BillingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
-    billing_address = models.ForeignKey(
-        'BillingAddress', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
-    payment = models.ForeignKey(
-        'Payment', on_delete=models.SET_NULL, blank=True, null=True)
-    coupon = models.ForeignKey(
-        'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
+    shipping_address = models.ForeignKey('BillingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
+    billing_address = models.ForeignKey('BillingAddress', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
+    payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)
+    coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, blank=True, null=True)
     being_delivered = models.BooleanField(default=False)
     received = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
@@ -79,6 +75,7 @@ class Order(models.Model):
         if self.coupon:
             total -= self.coupon.amount
         return total
+
     
 class BillingAddress(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
