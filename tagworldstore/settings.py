@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'djoser',
     'drf_yasg',
     "corsheaders",
+    'django_extensions',
     
     'cloudinary_storage',
     'cloudinary',
@@ -95,7 +96,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tagworldstore.wsgi.application'
 
-
+AUTH_USER_MODEL = 'accounts.User'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
