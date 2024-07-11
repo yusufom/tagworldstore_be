@@ -65,6 +65,18 @@ class ProductCartSerializer(serializers.ModelSerializer):
         exclude = ["category", "tag"]
         depth = 2
         
+class ProductReadOnlyCartSerializer(serializers.ModelSerializer):
+    variation = VariationCartSerializer(many=True)
+    id = serializers.CharField(read_only=True)
+    slug = serializers.CharField(read_only=True)
+    image = ImagesCartSerializer(many=True)
+    
+    
+    class Meta:
+        model = Product
+        exclude = ["category", "tag"]
+        depth = 2
+        
         
 class WishListSerializer(serializers.ModelSerializer):
     product = ProductSerializer()

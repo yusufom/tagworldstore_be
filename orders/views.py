@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from products.models import Product, Size, Variation
 from .models import CartItem, Order
+from billing.models import BillingAddress
 from .serializers import CartItemSerializer, CartItemListSerializer, CheckoutSessionSerializer, ConfirmOrderSerializer, CreateMulitpleCartItemsSerializer, ListOrderSerializer, OrderSerializer
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -77,14 +78,14 @@ class CartViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             try:
                 variation = product.variation.get(color=request.data.get('selected_product_color'))
-            except Variation.DoesNotExist:
-                return Response({"error": "Invalid color selected"}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Find the size stock from the variation
-            try:
                 size = variation.size.get(name=request.data.get('selected_product_size'))
+            except Variation.DoesNotExist:
+                pass
+                # return Response({"error": "Invalid color selected"}, status=status.HTTP_400_BAD_REQUEST)
             except Size.DoesNotExist:
-                return Response({"error": "Invalid size selected"}, status=status.HTTP_400_BAD_REQUEST)
+                # return Response({"error": "Invalid size selected"}, status=status.HTTP_400_BAD_REQUEST)
+                pass
+            
             res = serializer.validated_data
             res["product"].update(image=image)
             cart_item = CartItem.objects.filter(
@@ -97,8 +98,9 @@ class CartViewSet(viewsets.ViewSet):
             
 
             if cart_item:
+                
                 cart_item.quantity += request.data.get('quantity', 1)
-                if cart_item.quantity > size.stock:
+                if cart_item.quantity > cart_item.product.stock:
                     return Response({"error": "Not enough stock available"}, status=status.HTTP_400_BAD_REQUEST)
                 cart_item.save()
                     
@@ -143,7 +145,15 @@ class CartViewSet(viewsets.ViewSet):
         serializer = CheckoutSessionSerializer(data=request.data)
         if serializer.is_valid():
             pkid = serializer.validated_data['pkid']
+            b_id = serializer.validated_data['address']
+            
             try:
+                address = BillingAddress.objects.get(pk=b_id)
+                order = Order.objects.get(pkid=pkid)
+                order.ordered = True
+                order.note = request.data.get('note', '')
+                order.shipping_address = address
+                order.save()
                 checkout_session = stripe.checkout.Session.create(
                     line_items=serializer.validated_data['line_items'],
                     mode='payment',

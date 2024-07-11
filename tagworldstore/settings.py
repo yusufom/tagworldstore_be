@@ -258,6 +258,12 @@ DJOSER = {
     'LOGOUT_ON_PASSWORD_CHANGE': True,
     'SET_USERNAME_RETYPE': False,
     'SET_PASSWORD_RETYPE': True,
+    'SERIALIZERS': {
+        'user_create': 'djoser.serializers.UserCreateSerializer',
+        'current_user': 'djoser.serializers.UserSerializer',
+    'token': 'djoser.serializers.TokenSerializer',
+    'token_create': 'djoser.serializers.TokenCreateSerializer',
+    },
 }
 
 JAZZMIN_SETTINGS = {

@@ -2,6 +2,7 @@ from typing import Iterable
 from django.db import models
 from django.conf import settings
 # from billing.models import BillingAddress
+from billing.models import BillingAddress
 from products.models import Product
 User = settings.AUTH_USER_MODEL
 # Create your models here.
@@ -58,14 +59,15 @@ class Order(models.Model):
     pkid = models.UUIDField(default=uuid.uuid4, auto_created=True, editable=False, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ref_code = models.CharField(max_length=20, blank=True, null=True)
+    note = models.TextField(blank=True, null=True, default="")
     items = models.ManyToManyField(CartItem)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     ordered = models.BooleanField(default=False)
     shipping_address = models.ForeignKey(
-        'BillingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
+        BillingAddress, related_name='shipping_address', on_delete=models.DO_NOTHING, blank=True, null=True)
     billing_address = models.ForeignKey(
-        'BillingAddress', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
+        BillingAddress, related_name='billing_address', on_delete=models.DO_NOTHING, blank=True, null=True)
     payment = models.ForeignKey(
         'Payment', on_delete=models.SET_NULL, blank=True, null=True)
     coupon = models.ForeignKey(
@@ -89,22 +91,7 @@ class Order(models.Model):
             total -= self.coupon.amount
         return total
 
-    
-class BillingAddress(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
-    street_address = models.CharField(max_length=100)
-    apartment_address = models.CharField(max_length=100)
-    country = models.CharField(max_length=255)
-    postal = models.CharField(max_length=100)
-    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
-    default = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.user.username
-
-    class Meta:
-        verbose_name_plural = 'BillingAddresses'
         
         
 class Payment(models.Model):

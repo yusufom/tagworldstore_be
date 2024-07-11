@@ -1,11 +1,22 @@
 from rest_framework import serializers
 from orders.models import CartItem, Order
 from products.models import Product
-from products.serializers import ProductCartSerializer, ProductSerializer
+from products.serializers import ProductCartSerializer, ProductReadOnlyCartSerializer, ProductSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     product = ProductCartSerializer()
+    
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product',  'quantity', 'selected_product_color', 'selected_product_size']
+        depth = 1
+        
+class CartItemReadSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    product = ProductReadOnlyCartSerializer()
+    
 
     class Meta:
         model = CartItem
@@ -28,6 +39,7 @@ class LineItemSerializer(serializers.Serializer):
 class CheckoutSessionSerializer(serializers.Serializer):
     pkid = serializers.UUIDField()
     line_items = LineItemSerializer(many=True)
+    address = serializers.CharField()
     
     
 class OrderSerializer(serializers.Serializer):
@@ -40,7 +52,7 @@ class ConfirmOrderSerializer(serializers.Serializer):
     
     
 class ListOrderSerializer(serializers.ModelSerializer):
-    items = CartItemSerializer(many=True)
+    items = CartItemReadSerializer(many=True)
     
     class Meta:
         model = Order
