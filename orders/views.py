@@ -169,6 +169,7 @@ class OrderViewSet(viewsets.ViewSet):
         try:
             user = request.user
             serializer = OrderSerializer(data=request.data)
+            print(request.data)
             if serializer.is_valid():
                 print(serializer.validated_data['items'])
                 order = Order.objects.create(user=user)
