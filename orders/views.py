@@ -153,6 +153,7 @@ class CartViewSet(viewsets.ViewSet):
                 order.ordered = True
                 order.note = request.data.get('note', '')
                 order.shipping_address = address
+                order.status = "Confirmed"
                 order.save()
                 checkout_session = stripe.checkout.Session.create(
                     line_items=serializer.validated_data['line_items'],

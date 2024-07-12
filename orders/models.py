@@ -51,7 +51,9 @@ class Order(models.Model):
     
     class StatusChoices(models.TextChoices):
         PENDING = 'PENDING', 'Pending'
+        CONFIRMED = 'CONFIRMED', 'Confirmed'
         BEING_DELIVERED = 'BEING_DELIVERED', 'Being Delivered'
+        DELIVERED = 'DELIVERED', 'Delivered'
         RECEIVED = 'RECEIVED', 'Received'
         REFUND_REQUESTED = 'REFUND_REQUESTED', 'Refund Requested'
         REFUND_GRANTED = 'REFUND_GRANTED', 'Refund Granted'
