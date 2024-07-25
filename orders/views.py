@@ -81,9 +81,7 @@ class CartViewSet(viewsets.ViewSet):
                 size = variation.size.get(name=request.data.get('selected_product_size'))
             except Variation.DoesNotExist:
                 pass
-                # return Response({"error": "Invalid color selected"}, status=status.HTTP_400_BAD_REQUEST)
             except Size.DoesNotExist:
-                # return Response({"error": "Invalid size selected"}, status=status.HTTP_400_BAD_REQUEST)
                 pass
             except Exception: 
                 pass
