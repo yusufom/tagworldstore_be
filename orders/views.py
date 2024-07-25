@@ -85,6 +85,8 @@ class CartViewSet(viewsets.ViewSet):
             except Size.DoesNotExist:
                 # return Response({"error": "Invalid size selected"}, status=status.HTTP_400_BAD_REQUEST)
                 pass
+            except Exception: 
+                pass
             
             res = serializer.validated_data
             res["product"].update(image=image)
