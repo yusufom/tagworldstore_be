@@ -141,7 +141,7 @@ class CartViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['post'])
     def create_checkout_session(self, request):
-        print("data here",request.data)
+        # print("data here",request.data)
         serializer = CheckoutSessionSerializer(data=request.data)
         if serializer.is_valid():
             pkid = serializer.validated_data['pkid']
